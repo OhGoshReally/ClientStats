@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hosts</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="hosts.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="icon" href="hosts.ico" type="image/x-icon"/>
+</head>
+
+<body>
+  <div class="jumbotron text-center" id="tron">
+    <h1>Hosts</h1>
+    <p>Active hosts on the network</p>
+  </div>
+
+  <div class="container">
+    <div class="panel panel-default">    
+      <table class="table table-striped" id="table"></table>
+      <div class="panel-body" id="bottompanel"><p id="date"></p></div>
+    </div>
+  </div>
+<!--
+<script>
+
+
+
+  var myVar = setInterval(myTimer, 1000);
+
+</script>
+-->
+<script>
+  function loadXML() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            myFunction(this);
+        }
+    };
+    xhttp.open("GET", "https://ohgoshreally.com/hosts.xml", true);
+    xhttp.send();
+  }
+  loadXML();
+  function myFunction(xml) {
+    
+    function myTimer() {
+      var d = new Date();
+      var panel = "";
+      panel += "Last Update: " + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + " " + d.getHours() + ":" + (d.getMinutes()<10?'0':'') + d.getMinutes() + ":" + (d.getSeconds()<10?'0':'') + d.getSeconds();
+      document.getElementById("date").innerHTML = panel;
+    }
+  
+    myTimer();
+
+    var ip, i, xmlDoc, list, hosts, status, hostnames, hostname, mac, vendor;
+    list = "<thead><tr><th>" +
+      "Status" + "</th><th>" +
+      "Name" + "</th><th>" +
+      "IP" + "</th><th class='hidden-xs'>" +
+      "MAC Address" + "</th><th class='hidden-xs hidden-sm'>" +
+      "Manufacturer" + "</th>" +
+      "</tr></thead>";
+    xmlDoc = xml.responseXML;
+    hosts = xmlDoc.getElementsByTagName('host');
+
+    list += "<tbody>";
+  
+    for (i = 0; i < hosts.length; i++){
+  
+      status = hosts[i].getElementsByTagName('status')[0];
+      hostnames = hosts[i].getElementsByTagName('hostnames')[0];
+      hostname = hostnames.getElementsByTagName('hostname')[0];
+      ip = hosts[i].getElementsByTagName('address')[0];
+      vendor = hosts[i].getElementsByTagName('address')[1];
+      mac = hosts[i].getElementsByTagName('address')[1];
+      
+      list += "<tr><td>";
+      
+      /******** Status ********/
+      try {
+        if (status.getAttribute('state') == "up") {
+          list += '<i class="material-icons" id="checkmark">check_circle</i>' + "</td><td>"
+        }
+      } catch(err) {
+        list += "</td><td>";
+      }
+      
+      /******** Hostname ********/
+      try {
+        list += hostname.getAttribute('name') + "</td><td>";
+      }
+      catch(err) {
+        list += "</td><td>";
+      }
+  
+      /******** IP-Address ********/
+      try {
+        list += ip.getAttribute('addr') + "</td><td class='hidden-xs'>";
+      } catch(err) {
+        list += "</td><td class='hidden-xs'>";
+      }
+  
+      /******** MAC-Address ********/
+      try {
+        list += mac.getAttribute('addr') + "</td><td class='hidden-xs hidden-sm'>";
+      } catch(err) {
+        list += "</td><td class='hidden-xs hidden-sm'>";
+      }
+  
+      /******** Vendor ********/
+      try {
+        if (vendor.getAttribute('vendor') == null) {
+          list += "</td>";
+        } else {
+          list += vendor.getAttribute('vendor') + "</td>";
+        }
+      } catch(err) {
+        list += "</td>";
+      }
+  
+      list += "</tr>";
+      
+    }
+    list += "</tbody>";
+    document.getElementById("table").innerHTML = list;
+  }
+
+  var myVar = setInterval(loadXML, 30000);
+
+</script>
+
+</body>
+</html>
